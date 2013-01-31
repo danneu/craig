@@ -11,15 +11,21 @@ A Craigslist listings scraper.
 
 ## Usage
 
-    require "craig"
+~~~ ruby
+require "craig"
+~~~
 
 Pass in the city and category:
 
-    listings = Craig.query(:austin, :for_sale)
+~~~ ruby
+listings = Craig.query(:austin, :for_sale)
+~~~
 
 Or narrow down your results with a subcategory:
  
-    listings = Craig.query(:austin, :for_sale => :computers)
+~~~ ruby
+listings = Craig.query(:austin, :for_sale => :computers)
+~~~
 
 Returns up to 100 `Listing`s.
 
@@ -27,64 +33,78 @@ Returns up to 100 `Listing`s.
 
 Let's check out some cars within our budget.
     
-    vehicles = Craig.query(:austin, :for_sale => :cars_trucks)
-    vehicles.select { |v| 
-      v.price.between?(6000, 8000) && 
-      v.image? &&
-      v.seller == :owner 
-    }
-    
-    #=> [<Listing>, <Listing>, <Listing>]
+~~~ ruby
+vehicles = Craig.query(:austin, :for_sale => :cars_trucks)
+vehicles.select { |v| 
+  v.price.between?(6000, 8000) && 
+  v.image? &&
+  v.seller == :owner 
+}
+
+#=> [<Listing>, <Listing>, <Listing>]
+~~~
     
 I'm about to move to Birmingham. I wonder where the kids my age are living.
     
-    listings = Craig.query(:birmingham, :personals => :strictly_platonic)
-    listings.select { |p| 
-      p.age < 30
-    }.map(&:location)
-   
-    #= ["Highland Ave", "Highland Ave", "Highland Ave"]
+~~~ ruby
+listings = Craig.query(:birmingham, :personals => :strictly_platonic)
+listings.select { |p| 
+  p.age < 30
+}.map(&:location)
+
+#= ["Highland Ave", "Highland Ave", "Highland Ave"]
+~~~
 
 Oh wait, I left my trombone downtown last night. I wonder if anyone found it.
     
-    listings = Craig.query(:austin, :community => :lost_found
-    listings.any? { |listing| listing.title =~ /trombone/i }
-    
-    #=> true
+~~~ ruby
+listings = Craig.query(:austin, :community => :lost_found
+listings.any? { |listing| listing.title =~ /trombone/i }
+
+#=> true
+~~~
 
 Let's get the price of the most expensive Macbook that's sold by an owner 
 (instead of a dealer) on or near UT campus.
 
-    Craig.query(:austin, :for_sale => :computer)
-      .select { |c| 
-        c.seller == :owner && 
-        c.location[/campus/i] &&
-        c.title[/macbook/i]
-      }.sort_by { |c| 
-        -c.price 
-      }.first
+~~~ ruby
+Craig.query(:austin, :for_sale => :computer)
+  .select { |c| 
+    c.seller == :owner && 
+    c.location[/campus/i] &&
+    c.title[/macbook/i]
+  }.sort_by { |c| 
+    -c.price 
+  }.first
 
-    #=> {
-      :url => "http://austin.craigslist.org/sys/3723418912.html"
-      :title => "Late 2011 Macbook Pro"
-      :seller => :owner
-      :price => 1050
-      :posted_at => #<Date: 2013-01-23 ((2456316j,0s,0n),+0s,2299161j)>
-      :location => "West campus"
-      :has_map? => false
-      :has_image? => true
-      :id => 3723418912
-    }
+# Output
+
+#=> {
+  :url => "http://austin.craigslist.org/sys/3723418912.html"
+  :title => "Late 2011 Macbook Pro"
+  :seller => :owner
+  :price => 1050
+  :posted_at => #<Date: 2013-01-23 ((2456316j,0s,0n),+0s,2299161j)>
+  :location => "West campus"
+  :has_map? => false
+  :has_image? => true
+  :id => 3723418912
+}
+~~~
 
 ## Available Listing methods
 
 The easiest way to see what listings respond to is to just send them `Listing#to_hash`:
 
-    Craig.query(:new_york_city, :jobs).map(&:to_hash)
+~~~ ruby
+Craig.query(:new_york_city, :jobs).map(&:to_hash)
+~~~
 
 Or just look at console output (`Listing#to_s` outputs the hash in string form):
 
-    Craig.query(:new_york_city, :jobs)
+~~~ ruby
+Craig.query(:new_york_city, :jobs)
+~~~
 
 Or you can look in `listing.rb` to see the type of nodes that Listings have, then find the method each node defines in `node.rb`.
 
@@ -141,7 +161,9 @@ Here, let me translate some for you to be clear:
   </tr>
 </table>
 
-    Craig.query(:nice_cote_d_azur, :for_sale => :cds_dvd_vhs)
+~~~ ruby
+Craig.query(:nice_cote_d_azur, :for_sale => :cds_dvd_vhs)
+~~~
 
 If you're still unsure, just check out Craig's internal lookup table.
 
