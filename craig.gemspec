@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Craig::VERSION
   gem.authors       = ["Dan Neumann"]
   gem.email         = ["danrodneu@gmail.com"]
-  gem.description   = %q{a robust little Craigslist scraper that fetches listings.}
-  gem.summary       = %q{a robust little Craigslist scraper.}
+  gem.description   = %q{A Craigslist listings scraper.}
+  gem.summary       = %q{A Craigslist listings scraper.}
   gem.homepage      = "http://github.com/danneu/craig"
 
   gem.files         = `git ls-files`.split($/)

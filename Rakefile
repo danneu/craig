@@ -7,3 +7,10 @@ Rake::TestTask.new do |t|
 end
 desc "Run tests"
 task :default => :test
+
+namespace :cities do
+  desc "Update Craig::CITIES using Craigslists' city directory"
+  task :update do
+     system("ruby lib/craig/tasks/update_cities.rb")
+  end
+end
