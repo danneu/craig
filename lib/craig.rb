@@ -8,10 +8,8 @@ require "craig/page"
 require "craig/node"
 require "craig/listing"
 require "craig/craigslist"
-require "wrong"
 
 module Craig
-  include Wrong
 
   # Craig's sole entrypoint for grabbing listings based on city and categories.
   #
