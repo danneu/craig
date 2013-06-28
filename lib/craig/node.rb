@@ -18,6 +18,8 @@ module Craig
     module PostedAt
       # @return [Date]
       def posted_at
+        node = dom.at_css(".itemdate")
+        return Date.parse(node.text) if node
         current = dom
         while current = current.previous_element
           return Date.parse(current) if current.name == "h4"
@@ -30,7 +32,7 @@ module Craig
       def location
         node = dom.at_css(".itempn")
         return "" unless node
-        text = node.text.strip[1..-2].to_s
+        text = node.text.gsub(/\s+/, " ").strip[1..-2].to_s
         text ? text.strip : text
       end
     end
@@ -40,7 +42,9 @@ module Craig
       #
       # @return [Boolean]
       def has_image?
-        !!dom.at_css(".itempx").text[/(img|pic)/]
+        node = dom.at_css(".itempx")
+        return false unless node
+        !!node.text[/(img|pic)/]
       end
     end
 
@@ -65,7 +69,9 @@ module Craig
       #
       # @return [Boolean]
       def has_map?
-        !!dom.at_css(".itempx").text[/map/]
+        node = dom.at_css(".itempx")
+        return false unless node
+        !!node.text[/map/]
       end
     end
 
@@ -91,7 +97,9 @@ module Craig
       def seller
         node = dom.at_css(".gc")
         return nil unless node
-        node.text[/(dealer|owner)/].to_sym
+        seller = node.text[/(dealer|owner)/]
+        return nil unless seller
+        seller.to_sym
       end
     end
 
@@ -121,7 +129,7 @@ module Craig
       # @return [Int] area
       def square_feet
         node = dom.at_css(".itemph")
-        return nil unless node
+        return 0 unless node
         node.text[/\d+(?=ft)/].to_i
       end
     end
@@ -130,7 +138,7 @@ module Craig
       # @return [Int] number of bedrooms
       def bedrooms
         node = dom.at_css(".itemph")
-        return nil unless node
+        return 0 unless node
         node.text[/\d+(?=br)/].to_i
       end
     end
@@ -140,9 +148,9 @@ module Craig
       #
       # @return [Int] price
       def price
-        dom.elements
+        dom.text
+          .split
           .reverse
-          .map(&:text)
           .join("")[/(\$)(\d+)/, 2]
           .to_i
       end
