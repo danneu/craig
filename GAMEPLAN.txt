@@ -1,0 +1,261 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+So here's the Scraper concept I've started thinking about:
+
+A Scraper is just something that gets a webpage's DOM and returns a Node.
+Scrapers differentiate from eachother pretty much by the first Node they send the full 
+DOM to.
+
+  Craigslist.get("http://austin.craigslist.org/sya").listings
+  Simple.get("simple.com").items
+
+  module Scraper
+    def self.get(url)
+      ROOT_NODE.new(Nokogiri::HTML(open(url)))
+    end
+  end
+
+  module Simple
+    ROOT_NODE = SimpleRoot
+    include Scraper
+  end
+
+A Node just represents a node in the DOM. 
+    
+    module Node
+      def initialize(dom)
+        @dom = dom
+      end
+    end
+
+    class MyNode
+      include Node
+    end
+
+Just like the DOM, Nodes are composed
+of other Nodes. The composition chain of Nodes (within Nodes within Nodes) is what
+defines the accessors available on the root node.
+
+Let's say that our Simple scraper scrapes a fictitious website:
+
+  <html>
+    <h1>Welcome to Simple.com</h1>
+    <ul>
+      <li>Item 1</li>
+      <li>Item 2</li>
+      <li>Item 3</li>
+    </ul>
+    <div id="footer">
+      Don't steal this content!
+    </div>
+  </html>
+
+We would express *only the parts of the website we care about* by defining our
+own Nodes and composing them:
+
+
+  module Simple
+    class Root < Struct.new(:dom)
+       
+    end
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Listing
+  has various Nodes
+
+Listing
+  CommunityListing
+  PersonalsListing
+  HousingListing
+  ForSaleListing
+  ServicesListing
+  JobsListing
+  GigsListing
+
+Node
+  Title
+  Date
+  Location
+  Image
+  Price
+  Map
+  Seller
+  Age
+  Seeking # m4m etc.
+
+Listings include the Nodes that they support:
+
+class Listing
+  include Node::Title
+  include Node::Date
+  include Node::Location
+  include Node::Image
+end
+
+class PersonalsListing < Listing
+  include Node::Age
+  include Node::Seeking
+end
+  
+API:
+
+    Craig.query(:austin, :personals => :missed_connections)
+
+Returns a bunch of Listings that the gem consumer can access:
+
+    listings = Craig.query(:austin, :personals => :missed_connections)
+    listings.first.to_hash
+    #=> {
+          :title => "Saw u at strabucks lol hmu",
+          :location => "West Campus",
+          :age => 24,
+          :image? => false,
+          :seeking => :w4m,
+          ...
+        }
+
+Basically, (mostly pseudocode for brevity, but it's pretty close to the real thing).
+
+*  Craig will build a Page from the url generated from the #query input.
+
+      module Craig
+        def self.query(:city, :categories)
+          Page.new(open(build_url)).listings
+        end
+      end
+
+*  Page wraps the DOM and will map the listings rows to Listing objects.
+
+      class Page
+        def initialize(html)
+          @html = html
+        end
+
+        def listings
+          nodes.map { |node| Listing.new(node) }
+        end
+
+        private
+
+        def nodes
+          dom.css(".listing")
+        end
+
+        def dom
+          Nokogiri::HTML(@html)
+        end
+
+      end
+
+*  I haven't decided on how this will happen, but the type of Listing that is used
+   is determined by the :category passed in to Craig#query. 
+   
+   In other words, there is a 1:1 relationship between Craigslist categories and Listing subclasses because Craigslist is only variant across categories.
+
+   So, 
+   
+      Craig.query(:austin, :personals => :strictly_platonic)
+      
+   returns PersonalsListings. 
+
+*  Listings are composed of Nodes and descended from Listing.
+
+    class PersonalsListing < Listing
+      include Node::Age
+      include Node::Seeking
+    end
+
+* Nodes represent 
+
+* The base Listing class includes the Nodes that are common across all categories.
+  Unless a Node is included, it returns nil.
+
+  I want Listings to return nil if you call any non-included
+
+    class Listing
+      include Node::Title
+      include Node::Date
+      include Node::Location
+      include Node::Image
+    end
+
+  I suppose that Listing could 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# :category => :subcategory
+
+# First gonna try CategorySubcategoryListing
+# Not found? Then CategoryPageListing
+# Not found? Then Listing
+#
+# Listing subclasses are only used to specify any variant nodes to be included.
+# If a category page does not vary, then you don't need to subclass Page.
+#
+# Method Missing?
+# - Not all listings respond to all the messages. 
+# - It doesn't make sense to send "age" message to a ForSaleListing.
+
+# Reusable nodes:
+# 
+#   Date -> DateRange
+
+# What if lots of Listings have their own nodes? What would
+# that look like?
+
+
+#Listing.constants.map(&Listing.method(:const_get)).grep(Class)
+#=> [Listing::Base, Listing::PersonalsListing]
+#

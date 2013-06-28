@@ -1,2 +1,0 @@
-jQuery.fn.DefaultValue=function(text){return this.each(function(){var fld_current=this;if(this.value==''||this.value==text){$(this).addClass('dv');this.value=text;}else{return;}
-$(this).focus(function(){if(this.value==text||this.value==''){this.value='';$(this).removeClass('dv');}});$(this).blur(function(){if(this.value==text||this.value==''){this.value=text;$(this).addClass('dv');}});$(this).parents("form").each(function(){$(this).submit(function(){if(fld_current.value==text){fld_current.value='';}});});});};
