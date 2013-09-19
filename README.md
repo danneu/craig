@@ -1,3 +1,7 @@
+I pushed up a big ball of code that had been sitting on my laptop for a year: [here's the commit](https://github.com/danneu/craig/commit/ffc6e12645dc4d19cd62c07a63f7f8690162445b).
+
+It fixes some critical errors but I haven't yet updated the gem release.
+
 # Craig
 
 A Craigslist listings scraper.
