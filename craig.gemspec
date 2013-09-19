@@ -23,4 +23,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "wrong"
   gem.add_development_dependency "diff-lcs"
   gem.add_development_dependency "pry"
+  gem.add_development_dependency "turn"
 end
